@@ -3,7 +3,10 @@
 	"version": "1.0.0",
 	"description": "Convenience package for saving images locally. Supports image converting with sharp, automatic output folder creation & simplified handling of destination paths.",
 	"license": "MIT",
-	"repository": "ericbellamy/smart-image-saver",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ericbellamy/smart-image-saver.git"
+	},
 	"main": "main.js",
 	"keywords": [
 		"tiny",
@@ -24,5 +27,14 @@
 		"https": "^1.0.0",
 		"path": "^0.12.7",
 		"sharp": "^0.32.0"
-	}
+	},
+	"bugs": {
+		"url": "https://github.com/ericbellamy/smart-image-saver/issues"
+	},
+	"homepage": "https://github.com/ericbellamy/smart-image-saver#readme",
+	"devDependencies": {},
+	"scripts": {
+		"start": "node main.js"
+	},
+	"author": "ericbellamy"
 }

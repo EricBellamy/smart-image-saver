@@ -3,6 +3,7 @@ const path = require('path');
 const http = require('http');
 const https = require('https');
 const sharp = require('sharp');
+const colors = require('colors');
 
 function getFolderPath(filepath) {
 	const basename = path.basename(filepath);
@@ -10,13 +11,13 @@ function getFolderPath(filepath) {
 	return dirPath[dirPath.length - 1] === "/" ? dirPath : dirPath + "/";
 }
 
-async function convertAndSave(imageBuffer, folderPath, filename, filetype) {
+async function convertAndSave(imageBuffer, destFolder, destFileType, destFilePath) {
 	await new Promise(resolve => {
 		// Ensure the dest directory
-		fs.ensureDirSync(folderPath);
+		fs.ensureDirSync(destFolder);
 
 		// Save the file
-		sharp(imageBuffer).toFormat(filetype).toFile(folderPath + filename + "." + filetype, (err, info) => {
+		sharp(imageBuffer).toFormat(destFileType).toFile(destFilePath, (err, info) => {
 			if (err) throw new Error(err);
 			else resolve(true);
 		});
@@ -41,8 +42,6 @@ module.exports = async function (params) {
 	// Get the actual folder path from the specified output
 	params.path = getFolderPath(params.path);
 
-	console.log(params);
-
 	// Download the image
 	await new Promise(resolve => {
 		const client = params.url.startsWith('https') ? https : http;
@@ -55,7 +54,14 @@ module.exports = async function (params) {
 
 			res.on('end', async () => {
 				const imageBuffer = Buffer.concat(imageData);
-				await convertAndSave(imageBuffer, params.path, params.name, params.type);
+				const destFilePath = path.resolve(params.path + params.name + "." + params.type);
+
+				if(params.log != false) console.log(colors.yellow("\nSaving file..."), colors.cyan(params.url));
+
+				await convertAndSave(imageBuffer, params.path, params.type, destFilePath);
+
+				if(params.log != false) console.log(colors.green("Saved:"), colors.cyan(destFilePath));
+
 				resolve(true);
 			});
 		}).on('error', (err) => {
