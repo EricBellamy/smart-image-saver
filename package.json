@@ -1,6 +1,6 @@
 {
 	"name": "smart-image-saver",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Convenience package for saving images locally. Supports image converting with sharp, automatic output folder creation & simplified handling of destination paths.",
 	"license": "MIT",
 	"repository": {
