@@ -25,15 +25,19 @@ async function convertAndSave(imageBuffer, destFolder, destFileType, destFilePat
 }
 
 module.exports = async function (params) {
+	const missingName = params.name === undefined;
+
 	if (typeof params.url != "string") throw new Error("DownloadImage 'url' is invalid: " + params.url);
 	if (typeof params.path != "string") throw new Error("DownloadImage 'path' is invalid: " + params.path);
 	if (params.type != undefined && typeof params.type != "string") throw new Error("DownloadImage 'type' is invalid: " + params.type);
 
 	// Make sure the name is correct
-	if (params.name === undefined) params.name = params.url; // Ensure we have an output name
-	params.name = path.basename(params.name);
-	const nameExt = path.extname(params.name);
-	if (nameExt.length != 0) params.name = params.name.substring(0, params.name.indexOf(nameExt));
+	if(missingName || params.smart != false){
+		if (params.name === undefined) params.name = params.url; // Ensure we have an output name
+		params.name = path.basename(params.name);
+		const nameExt = path.extname(params.name);
+		if (nameExt.length != 0) params.name = params.name.substring(0, params.name.indexOf(nameExt));	
+	}
 
 	// Make sure the type is correct
 	if (params.type === undefined) params.type = path.extname(params.url); // Ensure we have an output file type
@@ -41,6 +45,11 @@ module.exports = async function (params) {
 
 	// Get the actual folder path from the specified output
 	params.path = getFolderPath(params.path);
+
+	// Create the dest path
+	let destFilePath;
+	if(missingName || params.smart != false) destFilePath = path.resolve(params.path + params.name + "." + params.type);
+	else destFilePath = path.resolve(params.path + params.name);
 
 	// Download the image
 	await new Promise(resolve => {
@@ -54,7 +63,6 @@ module.exports = async function (params) {
 
 			res.on('end', async () => {
 				const imageBuffer = Buffer.concat(imageData);
-				const destFilePath = path.resolve(params.path + params.name + "." + params.type);
 
 				if(params.log != false) console.log(colors.yellow("\nSaving file..."), colors.cyan(params.url));
 
